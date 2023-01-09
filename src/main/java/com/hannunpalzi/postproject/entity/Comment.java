@@ -25,8 +25,7 @@ public class Comment extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Post post;
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<CommentLike> like = new ArrayList<>();
+    private Long commentLike;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<ReComment> reComments = new ArrayList<>();
@@ -36,13 +35,19 @@ public class Comment extends TimeStamped {
         this.writer = user.getUsername();
         this.user = user;
         this.post = post;
+        this.commentLike = 0L;
     }
 
     public Comment(String comment, User user){
         this.comment = comment;
         this.user = user;
     }
-
+    public void plusLike(){
+        this.commentLike += 1;
+    }
+    public void minusLike(){
+        this.commentLike -= 1;
+    }
     public void updateComment(String comment){
         this.comment = comment;
     }

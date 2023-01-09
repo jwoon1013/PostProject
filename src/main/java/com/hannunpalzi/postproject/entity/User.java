@@ -24,6 +24,8 @@ public class User {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
+    @Column
+    private String refreshToken;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
@@ -34,5 +36,9 @@ public class User {
         this.username = username;
         this.password = password;
         this.role = role;
+        this.refreshToken = null;
+    }
+    public void addRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
     }
 }

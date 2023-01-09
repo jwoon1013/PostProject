@@ -4,7 +4,6 @@ import com.hannunpalzi.postproject.dto.*;
 import com.hannunpalzi.postproject.entity.User;
 import com.hannunpalzi.postproject.entity.UserRoleEnum;
 import com.hannunpalzi.postproject.repository.UserRepository;
-import com.hannunpalzi.postproject.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,7 +53,7 @@ public class UserService {
     }
 
     @Transactional
-    public UsernameAndRoleResponseDto login(LoginRequestDto requestDto) {
+    public UsernameAndRoleResponseDto login(LoginRequestDto requestDto,String refreshToken) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
 
@@ -65,14 +64,14 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+        user.addRefreshToken(refreshToken);
         return new UsernameAndRoleResponseDto(username, user.getRole());
     }
     @Transactional
     public void delete(UserDeleteRequestDto requestDto, Long userId){
-        String username = requestDto.getUsername();
         String password = requestDto.getPassword();
 
-        User user = userRepository.findByUsername(username).orElseThrow(
+        User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalArgumentException("등록된 아이디가 없습니다.")
         );
         if (!passwordEncoder.matches(password, user.getPassword())) {

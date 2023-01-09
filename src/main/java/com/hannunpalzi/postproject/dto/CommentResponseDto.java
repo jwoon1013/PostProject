@@ -28,7 +28,7 @@ public class CommentResponseDto {
                 comments.getComment(),
                 comments.getCreatedAt(),
                 comments.getModifiedAt(),
-                (long)comments.getLike().size(),
+                comments.getCommentLike(),
                 comments.getReComments()
                 );
     }

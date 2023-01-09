@@ -1,7 +1,6 @@
 package com.hannunpalzi.postproject.controller;
 
 import com.hannunpalzi.postproject.dto.*;
-import com.hannunpalzi.postproject.entity.UserRoleEnum;
 import com.hannunpalzi.postproject.security.UserDetailsImpl;
 import com.hannunpalzi.postproject.service.CommentService;
 import io.swagger.annotations.Api;
@@ -9,7 +8,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +35,7 @@ public class CommentController {
         return commentService.updateComment(commentId, postId, commentRequestDto, username);
     }
     //댓글 수정 (관리자)
-    @Secured(UserRoleEnum.Authority.ADMIN)
+//    @Secured(UserRoleEnum.Authority.ADMIN)
     @PutMapping("/admin/posts/{postId}/comments/{commentId}")
     @ApiImplicitParams({@ApiImplicitParam(name = "postId", value = "게시글 id", dataTypeClass = Integer.class,example="1"), @ApiImplicitParam(name = "commentId", value = "댓글 id", dataTypeClass = Integer.class,example="1")})
     @ApiOperation(value = "댓글 수정(관리자)", notes = "댓글을 관리자 권한으로 수정한다.")
@@ -54,7 +52,7 @@ public class CommentController {
         return commentService.deleteComment(commentId, postId, username);
     }
     // 댓글 삭제 (관리자)
-    @Secured(UserRoleEnum.Authority.ADMIN)
+//    @Secured(UserRoleEnum.Authority.ADMIN)
     @DeleteMapping("/admins/posts/{postId}/comments/{commentId}")
     @ApiImplicitParams({@ApiImplicitParam(name = "postId", value = "게시글 id", dataTypeClass = Integer.class,example="1"), @ApiImplicitParam(name = "commentId", value = "댓글 id", dataTypeClass = Integer.class,example="1")})
     @ApiOperation(value = "댓글 삭제(관리자)", notes = "댓글을 관리자 권한으로 삭제한다.")

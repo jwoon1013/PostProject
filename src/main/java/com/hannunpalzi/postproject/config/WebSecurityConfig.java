@@ -2,6 +2,9 @@ package com.hannunpalzi.postproject.config;
 
 import com.hannunpalzi.postproject.jwtUtil.JwtAuthFilter;
 import com.hannunpalzi.postproject.jwtUtil.JwtUtil;
+import com.hannunpalzi.postproject.jwtUtil.RefreshJwt;
+import com.hannunpalzi.postproject.repository.UserRepository;
+import com.hannunpalzi.postproject.security.CustomAccessDeniedHandler;
 import com.hannunpalzi.postproject.security.CustomAuthenticationEntryPoint;
 import com.hannunpalzi.postproject.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +29,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtUtil jwtUtil;
+    private final RefreshJwt refreshJwt;
     private final UserDetailsServiceImpl userDetailsService;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final UserRepository userRepository;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -37,7 +43,8 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toH2Console())
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                .antMatchers(HttpMethod.GET, "/categories/**","/posts/**");
     }
 
     @Bean
@@ -59,14 +66,18 @@ public class WebSecurityConfig {
                         /* swagger v3 */
                         "/v3/api-docs/**",
                         "/swagger-ui/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/posts/**").permitAll()
                 .antMatchers(HttpMethod.DELETE,"/users/**").permitAll()
+                .antMatchers(HttpMethod.DELETE,"/categories/**").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/categories/**").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.PUT,"/categories/**").hasAnyRole("ADMIN")
+                .antMatchers("/admin/posts/**").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
-                .and().addFilterBefore(new JwtAuthFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class);
+                .and().addFilterBefore(new JwtAuthFilter(jwtUtil, userDetailsService,refreshJwt,userRepository), UsernamePasswordAuthenticationFilter.class);
 
+        //401 인증과정 실패시 에러처리
         http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
-
-
+        //403
+        http.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler);
 
         return http.build();
     }

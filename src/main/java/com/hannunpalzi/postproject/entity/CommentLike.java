@@ -17,9 +17,12 @@ public class CommentLike {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Comment comment;
+    @Column(nullable = false)
+    private Long postId;
 
-    public CommentLike(String username, Comment comment) {
+    public CommentLike(String username, Comment comment,Long postId) {
         this.username = username;
         this.comment = comment;
+        this.postId = postId;
     }
 }

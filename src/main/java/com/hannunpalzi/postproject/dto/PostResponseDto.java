@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PostResponseDto {
     private Long postId; // 게시글 id
+    private Long categoryId; // 카테고리 id
     private String title; // 게시글 제목
     private String contents; // 게시글 내용
     private String writer; // 게시글 작성자
@@ -24,17 +25,18 @@ public class PostResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifiedAt; // 게시글 수정시간
     private Long like;
-    private List<CommentResponseDto> commentResponseDtoList; // 게시글에 달린 댓글 리스트
+    private List<CommentResponseDto> commentList; // 게시글에 달린 댓글 리스트
 
 
     public PostResponseDto(Post post) {
         this.postId = post.getId();
+        this.categoryId = post.getCategoryId();
         this.title = post.getTitle();
         this.contents = post.getContents();
         this.writer = post.getWriter();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
-        this.like = (long) post.getLike().size();
-        this.commentResponseDtoList = post.getComments().stream().map(CommentResponseDto::valueOf).collect(Collectors.toList()); // stream.map(comment -> CommentResponseDto  과정 추가 필요)
+        this.like =  post.getPostLike();
+        this.commentList = post.getComments().stream().map(CommentResponseDto::valueOf).collect(Collectors.toList()); // stream.map(comment -> CommentResponseDto  과정 추가 필요)
     }
 }

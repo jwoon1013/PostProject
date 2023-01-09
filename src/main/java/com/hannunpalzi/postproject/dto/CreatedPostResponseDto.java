@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 public class CreatedPostResponseDto {
     private final Long postId; // 게시글 id
+    private final Long categoryId; // 카테고리 id
     private final String title; // 게시글 제목
     private final String contents; // 게시글 내용
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -17,6 +18,7 @@ public class CreatedPostResponseDto {
     //createPost 리턴 DTO
     public CreatedPostResponseDto(Post post){
         this.postId = post.getId();
+        this.categoryId = post.getCategoryId();
         this.title = post.getTitle();
         this.contents = post.getContents();
         this.createdAt = post.getCreatedAt();

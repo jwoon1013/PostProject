@@ -5,6 +5,7 @@ import com.hannunpalzi.postproject.dto.*;
 import com.hannunpalzi.postproject.entity.Comment;
 import com.hannunpalzi.postproject.entity.User;
 import com.hannunpalzi.postproject.entity.Post;
+import com.hannunpalzi.postproject.repository.CommentLikeRepository;
 import com.hannunpalzi.postproject.repository.CommentRepository;
 import com.hannunpalzi.postproject.repository.PostRepository;
 import com.hannunpalzi.postproject.repository.UserRepository;
@@ -21,6 +22,7 @@ public class CommentService {
     private final UserRepository userRepository;
 
     private final PostRepository postRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     // 코멘트 작성하기
     @Transactional
@@ -84,6 +86,7 @@ public class CommentService {
                 () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         );
         if (comment.checkUserNameIsWriter(username)){
+            commentLikeRepository.deleteAllByComment(comment);
             commentRepository.deleteById(commentId);
         }else throw new IllegalArgumentException("본인이 작성한 댓글만 삭제할 수 있습니다.");
 
@@ -92,7 +95,7 @@ public class CommentService {
 
     @Transactional
     public StatusResponseDto deleteCommentAdmin(Long commentId, Long postId, String username){
-        commentRepository.findById(commentId).orElseThrow(
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다.")
         );
         userRepository.findByUsername(username).orElseThrow(
@@ -101,6 +104,7 @@ public class CommentService {
         postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         );
+        commentLikeRepository.deleteAllByComment(comment);
         commentRepository.deleteById(commentId);
         return new StatusResponseDto(200, "댓글을 삭제하였습니다.");
     }

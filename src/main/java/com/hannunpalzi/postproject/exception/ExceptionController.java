@@ -20,7 +20,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.nio.charset.Charset;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -50,6 +53,7 @@ public class ExceptionController {
         return new ResponseEntity<>(statusResponseDto,httpHeaders,HttpStatus.FORBIDDEN);
     }
 
+
     @ExceptionHandler(JwtException.class)
     private ResponseEntity<StatusResponseDto> JwtExceptionHandler(JwtException e){
         StatusResponseDto statusResponseDto = new StatusResponseDto(HttpStatus.UNAUTHORIZED.value(),e.getMessage());
@@ -76,11 +80,23 @@ public class ExceptionController {
 
     @ExceptionHandler(SignatureException.class)
     private ResponseEntity<StatusResponseDto> SignatureExceptionHandler(SignatureException e){
-        System.out.println("xxxx");
         StatusResponseDto statusResponseDto = new StatusResponseDto(HttpStatus.UNAUTHORIZED.value(),e.getMessage());
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
         return new ResponseEntity<>(statusResponseDto,httpHeaders,HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    private ResponseEntity<StatusResponseDto> ConstraintViolationExceptionHandler(ConstraintViolationException e){
+        String message = e.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .toList()
+                .get(0);
+        StatusResponseDto statusResponseDto = new StatusResponseDto(HttpStatus.BAD_REQUEST.value(), message);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        return new ResponseEntity<>(statusResponseDto,httpHeaders,HttpStatus.BAD_REQUEST);
     }
     ///////////////////////////////////////////커스텀익셉션/////////////////////////////////////////////////////////////
     @ExceptionHandler(InvalidTokenException.class)
